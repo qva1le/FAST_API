@@ -34,6 +34,40 @@ def create_hotel(
     })
     return {"status": "OK"}
 
+@app.put("/hotels/{hotel_id}")
+def edit_hotel(
+       hotel_id: int,
+       title: str = Body(...),
+       name: str = Body(...)
+):
+
+    global hotels
+    for i, hotel in enumerate(hotels):
+        if hotel["id"] == hotel_id:
+            hotels[i] = {
+                "id": hotel_id,
+                "title": title,
+                "name": name
+            }
+            return {"status": "OK", "hotel": hotels[i]}
+    return {"status": "error", "message": f"Hotel with id {hotel_id} not found"}
+
+@app.patch("/hotels/{hotel_id}")
+def update_hotel_field(
+       hotel_id: int,
+       title: str | None = Body(default=None),
+):
+
+    global hotels
+    for i, hotel in enumerate(hotels):
+        if hotel["id"] == hotel_id:
+            if title is not None:
+                hotels[i]["title"] = title
+            return {"status": "OK", "hotel": hotels[i]}
+    return {"status": "error", "message": f"Hotel with id {hotel_id} not found"}
+
+
+
 
 @app.delete("/hotels/{hotel_id}")
 def delete_hotel_id(hotel_id: int):
