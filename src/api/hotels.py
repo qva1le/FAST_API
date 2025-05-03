@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Body, Query, APIRouter
-from pydantic import BaseModel, Field
-from pygments.lexer import default
 
-from schemas.hotels import Hotel, HotelPatch
+
+
+
+from src.api.dependecies import PaginationDep
+from src.schemas.hotels import Hotel, HotelPatch
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -22,18 +24,20 @@ hotels = [
 
 @router.get("", summary="Получение отелей", description="<h1>Тут мы получаем все отели, которые у нас есть<h1>")
 def get_hotels(
+        pagination: PaginationDep,
         id: int | None = Query(None, description="Айдишник"),
         title: str | None = Query(None, description="Название отеля"),
-        page: int | None = Query(1, description="Номер страницы"),
-        per_page: int | None = Query(5, description="Количество отелей на странице"),
+
 ):
 
     global hotels
     for hotel in hotels:
         if hotel["id"] == id or hotel["title"] == title:
             return hotel
-    return hotels[page * per_page - per_page: page * per_page]
-    # 1 * 5 - 5
+        if pagination.page and pagination.per_page:
+            return hotels[pagination.page * pagination.per_page - pagination.per_page: pagination.page * pagination.per_page]
+    return hotels
+
 
 
 
