@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Body, Query, APIRouter
+from select import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from src.api.dependecies import PaginationDep
 from src.schemas.hotels import Hotel, HotelPatch
 from src.models.hotels import HotelsOrm
@@ -11,33 +12,25 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 
 
-hotels = [
-     {"id": 1, "title": "Sochi", "name": "sochi"},
-     {"id": 2, "title": "Дубай", "name": "dubai"},
-     {"id": 3, "title": "Мальдивы", "name": "maldivi"},
-     {"id": 4, "title": "Геленджик", "name": "gelendzhik"},
-     {"id": 5, "title": "Москва", "name": "moscow"},
-     {"id": 6, "title": "Казань", "name": "kazan"},
-     {"id": 7, "title": "Санкт-Петербург", "name": "spb"},
- ]
-
-
-
 @router.get("", summary="Получение отелей", description="<h1>Тут мы получаем все отели, которые у нас есть<h1>")
-def get_hotels(
+async def get_hotels(
         pagination: PaginationDep,
         id: int | None = Query(None, description="Айдишник"),
         title: str | None = Query(None, description="Название отеля"),
 
 ):
+    async with async_session_maker() as session:
+        query = select(HotelsOrm)
+        result = await session.execute(query)
 
-    global hotels
-    for hotel in hotels:
-        if hotel["id"] == id or hotel["title"] == title:
-            return hotel
-        if pagination.page and pagination.per_page:
-            return hotels[pagination.page * pagination.per_page - pagination.per_page: pagination.page * pagination.per_page]
-    return hotels
+        hotels = result.scalars().all()
+        print(type(hotels), hotels)
+        return hotels
+
+
+        # if pagination.page and pagination.per_page:
+        #     return hotels[pagination.page * pagination.per_page - pagination.per_page: pagination.page * pagination.per_page]
+
 
 
 
