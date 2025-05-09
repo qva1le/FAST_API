@@ -7,6 +7,7 @@ from src.api.dependecies import PaginationDep
 from src.schemas.hotels import Hotel, HotelPatch
 from src.models.hotels import HotelsOrm
 from src.database import async_session_maker
+from src.repositories.hotels import HotelsRepository
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -21,21 +22,30 @@ async def get_hotels(
 ):
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        query = select(HotelsOrm)
-        if location:
-            query = query.filter(HotelsOrm.location.ilike(f"%{location}%"))
-        if title:
-            query = query.filter(HotelsOrm.title.ilike(f"%{title}%"))
+       return await HotelsRepository(session).get_all(
+           location=location,
+           title=title,
+           limit=per_page,
+           offset=per_page * (pagination.page - 1)
+       )
 
-        query = (
-            query
-            .limit(per_page)
-            .offset(per_page * (pagination.page - 1))
-        )
-        result = await session.execute(query)
-        hotels = result.scalars().all()
-        print(type(hotels), hotels)
-        return hotels
+    # per_page = pagination.per_page or 5
+    #
+    #     query = select(HotelsOrm)
+    #     if location:
+    #         query = query.filter(HotelsOrm.location.ilike(f"%{location}%"))
+    #     if title:
+    #         query = query.filter(HotelsOrm.title.ilike(f"%{title}%"))
+    #
+    #     query = (
+    #         query
+    #         .limit(per_page)
+    #         .offset(per_page * (pagination.page - 1))
+    #     )
+    #     result = await session.execute(query)
+    #     hotels = result.scalars().all()
+    #     print(type(hotels), hotels)
+    #     return hotels
 
 
         # if pagination.page and pagination.per_page:
