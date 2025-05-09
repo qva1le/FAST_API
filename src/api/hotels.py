@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Body, Query, APIRouter
-from select import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from sqlalchemy import insert, select
@@ -29,32 +28,6 @@ async def get_hotels(
            offset=per_page * (pagination.page - 1)
        )
 
-    # per_page = pagination.per_page or 5
-    #
-    #     query = select(HotelsOrm)
-    #     if location:
-    #         query = query.filter(HotelsOrm.location.ilike(f"%{location}%"))
-    #     if title:
-    #         query = query.filter(HotelsOrm.title.ilike(f"%{title}%"))
-    #
-    #     query = (
-    #         query
-    #         .limit(per_page)
-    #         .offset(per_page * (pagination.page - 1))
-    #     )
-    #     result = await session.execute(query)
-    #     hotels = result.scalars().all()
-    #     print(type(hotels), hotels)
-    #     return hotels
-
-
-        # if pagination.page and pagination.per_page:
-        #     return hotels[pagination.page * pagination.per_page - pagination.per_page: pagination.page * pagination.per_page]
-
-
-
-
-
 @router.post("", summary="Создание отеля", description="<h1>Тут мы создаем отель<h1>")
 async def create_hotel(
         hotel_data: Hotel = Body(openapi_examples={
@@ -73,14 +46,17 @@ async def create_hotel(
                 }
             }
         })
+
 ):
     async with async_session_maker() as session:
-         add_hotel_stmt = insert(HotelsOrm).values(**hotel_data.model_dump())
-         print(add_hotel_stmt.compile(compile_kwargs={"literal_binds": True}))# позволяет увидеть что именно отправляем в базу данных(для дебага)
-         await session.execute(add_hotel_stmt)
+         hotel = await HotelsRepository(session).add(
+             title=hotel_data.title,
+             location=hotel_data.location,
+         )
+         #print(add_hotel_stmt.compile(compile_kwargs={"literal_binds": True}))# позволяет увидеть что именно отправляем в базу данных(для дебага)
          await session.commit()
 
-    return {"status": "OK"}
+    return {"status": "OK", "hotel": hotel}
 
 
 
