@@ -49,11 +49,7 @@ async def create_hotel(
 
 ):
     async with async_session_maker() as session:
-         hotel = await HotelsRepository(session).add(
-             title=hotel_data.title,
-             location=hotel_data.location,
-         )
-         #print(add_hotel_stmt.compile(compile_kwargs={"literal_binds": True}))# позволяет увидеть что именно отправляем в базу данных(для дебага)
+         hotel = await HotelsRepository(session).add(hotel_data)
          await session.commit()
 
     return {"status": "OK", "hotel": hotel}
