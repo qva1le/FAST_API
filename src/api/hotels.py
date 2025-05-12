@@ -67,18 +67,16 @@ async def edit_hotel(hotel_id: int, hotel_data: Hotel):
 
 
 @router.patch("/{hotel_id}", summary="Изменение одного поля отеля, но не обязательно", description="<h1>Тут мы изменяем одно поле отеля<h1>")
-def update_hotel_field(
+async def update_hotel_field(
        hotel_id: int,
        hotel_data: HotelPatch,
 ):
 
-    global hotels
-    for i, hotel in enumerate(hotels):
-        if hotel["id"] == hotel_id:
-            if hotel_data.title is not None:
-                hotels[i]["title"] = hotel_data.title
-            return {"status": "OK", "hotel": hotels[i]}
-    return {"status": "error", "message": f"Hotel with id {hotel_id} not found"}
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data,exclude_unset=True,id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}
+
 
 
 
