@@ -57,22 +57,12 @@ async def create_hotel(
 
 
 @router.put("/{hotel_id}", summary="Изменение всего отеля", description="<h1>Тут мы изменяем весь отель<h1>")
-def edit_hotel(
-       hotel_id: int,
-       hotel_data: Hotel,
+async def edit_hotel(hotel_id: int, hotel_data: Hotel):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_data,id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}
 
-):
-
-    global hotels
-    for i, hotel in enumerate(hotels):
-        if hotel["id"] == hotel_id:
-            hotels[i] = {
-                "id": hotel_id,
-                "title": hotel_data.title,
-                "name": hotel_data.name,
-            }
-            return {"status": "OK", "hotel": hotels[i]}
-    return {"status": "error", "message": f"Hotel with id {hotel_id} not found"}
 
 
 
@@ -93,8 +83,8 @@ def update_hotel_field(
 
 
 @router.delete("/{hotel_id}", summary="Удаление отеля", description="<h1>Тут мы удаляем отель<h1>")
-def delete_hotel_id(hotel_id: int):
-    global hotels
-    for hotel in hotels:
-        if hotel["id"] != id:
-            return {"status": "OK"}
+async def delete_hotel_id(hotel_id: int):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).delete(id=hotel_id)
+        await session.commit()
+    return {"status": "OK"}
