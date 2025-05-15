@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from sqlalchemy import insert, select
 from src.api.dependecies import PaginationDep
-from src.schemas.hotels import Hotel, HotelPatch
+from src.schemas.hotels import Hotel, HotelPatch, HotelAdd
 from src.models.hotels import HotelsOrm
 from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
@@ -32,12 +32,12 @@ async def get_hotels(
 @router.get("/{hotel_id}")
 async def get_hotel(hotel_id: int):
     async with async_session_maker() as session:
-        return await HotelsRepository(session).get_one(id=hotel_id)
+        return await HotelsRepository(session).get_one_or_none(id=hotel_id)
 
 
 @router.post("", summary="Создание отеля", description="<h1>Тут мы создаем отель<h1>")
 async def create_hotel(
-        hotel_data: Hotel = Body(openapi_examples={
+        hotel_data: HotelAdd = Body(openapi_examples={
             "1": {
                 "summary": "Сочи",
                 "value": {
@@ -64,7 +64,7 @@ async def create_hotel(
 
 
 @router.put("/{hotel_id}", summary="Изменение всего отеля", description="<h1>Тут мы изменяем весь отель<h1>")
-async def edit_hotel(hotel_id: int, hotel_data: Hotel):
+async def edit_hotel(hotel_id: int, hotel_data: HotelAdd):
     async with async_session_maker() as session:
         await HotelsRepository(session).edit(hotel_data,id=hotel_id)
         await session.commit()
@@ -76,7 +76,7 @@ async def edit_hotel(hotel_id: int, hotel_data: Hotel):
 @router.patch("/{hotel_id}", summary="Изменение одного поля отеля, но не обязательно", description="<h1>Тут мы изменяем одно поле отеля<h1>")
 async def update_hotel_field(
        hotel_id: int,
-       hotel_data: HotelPatch,
+       hotel_data: HotelPatch   ,
 ):
 
     async with async_session_maker() as session:
