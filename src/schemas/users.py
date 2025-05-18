@@ -1,3 +1,5 @@
+from xml.dom import INDEX_SIZE_ERR
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -14,5 +16,10 @@ class UserAdd(BaseModel):
 class User(UserAdd):
     id: int
     email: EmailStr
+
+    model_config = ConfigDict(from_attributes=True)
+
+class UserWithHashedPassword(User):
+    hashed_password: str
 
     model_config = ConfigDict(from_attributes=True)
