@@ -48,7 +48,6 @@ async def get_me(
 
 @router.get("/logout")
 async def logout_user(
-    user_id: UserIdDep,
     response: Response,
 ):
     async with async_session_maker() as session:
