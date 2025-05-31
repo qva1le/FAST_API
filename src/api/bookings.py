@@ -12,6 +12,21 @@ from src.models.bookings import BookingsOrm
 
 router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
+@router.get("")
+async def get_bookings(
+        db: DBDep,
+        room_id: int | None =Query(None, description="Айдишник пользователя"),
+):
+    if room_id is None:
+        return await db.bookings.get_all(room_id=room_id)
+    else:
+        return await db.bookings.get_filtered(room_id=room_id)
+
+
+@router.get("/me")
+async def get_me_bookings(db: DBDep, user_id: UserIdDep):
+    return await db.bookings.get_filtered(user_id=user_id)
+
 @router.post("")
 async def create_booking(
         user_id: UserIdDep,
@@ -29,17 +44,9 @@ async def create_booking(
     await db.commit()
     return {"status": "OK", "data": booking}
 
-@router.get("")
-async def get_bookings(
-        db: DBDep,
-        room_id: int | None =Query(None, description="Айдишник пользователя"),
-):
-    if room_id is None:
-        return await db.bookings.get_all(room_id=room_id)
-    else:
-        return await db.bookings.get_filtered(room_id=room_id)
 
-
-@router.get("/me")
-async def get_me_bookings(db: DBDep, user_id: UserIdDep):
-    return await db.bookings.get_filtered(user_id=user_id)
+@router.delete("/{bookings_id}")
+async def delete_bookings(booking_id: int, db: DBDep):
+    await db.bookings.delete(id=booking_id)
+    await db.commit()
+    return {"status": "OK"}
