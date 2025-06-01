@@ -15,7 +15,7 @@ router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 @router.get("")
 async def get_bookings(
         db: DBDep,
-        room_id: int | None =Query(None, description="Айдишник пользователя"),
+        room_id: int | None =Query(None, description="Айдишник номера"),
 ):
     if room_id is None:
         return await db.bookings.get_all(room_id=room_id)
