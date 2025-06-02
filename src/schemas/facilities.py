@@ -8,5 +8,5 @@ class FacilitiesAddRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class FacilitiesAdd(BaseModel):
-    room_id: int
+    facility_id: int
     title: str

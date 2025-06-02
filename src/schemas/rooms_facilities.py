@@ -2,6 +2,9 @@ from pydantic import BaseModel
 
 
 
-class RoomsFacilitiesAddRequest(BaseModel):
+class RoomFacilityAdd(BaseModel):
     room_id: int
-    title: str
+    facility_id: int
+
+class RoomFacility(RoomFacilityAdd):
+    id: int
