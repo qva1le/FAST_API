@@ -8,3 +8,4 @@ class RoomFacilityAdd(BaseModel):
 
 class RoomFacility(RoomFacilityAdd):
     id: int
+

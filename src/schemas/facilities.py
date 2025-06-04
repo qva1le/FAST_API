@@ -10,3 +10,8 @@ class FacilitiesAddRequest(BaseModel):
 class FacilitiesAdd(BaseModel):
     facility_id: int
     title: str
+
+class Facility(FacilitiesAddRequest):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
