@@ -1,19 +1,25 @@
+import json
+
 from fastapi import APIRouter, Query
+
+from fastapi_cache.decorator import cache
+
 from src.api.dependecies import DBDep
+from src.init import redis_manager
 from src.schemas.facilities import FacilitiesAddRequest
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
 
 @router.get("")
+@cache(expire=10)
 async def get_facilities(
         db: DBDep,
         facility_id: int | None = Query(None, description="Айдишник удобства" ),
 ):
-   if facility_id is None:
-       return await db.facilities.get_all()
-   else:
-       return await db.facilities.get_filtered(id=facility_id)
+    print("ИДУ В БД")
+    return await db.facilities.get_all()
+
 
 @router.post("")
 async def create_facility(title_data: FacilitiesAddRequest, db: DBDep):
