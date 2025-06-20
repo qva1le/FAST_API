@@ -1,5 +1,4 @@
 from datetime import date
-
 from sqlalchemy import select, func, insert
 
 from src.models.rooms import RoomsOrm
@@ -30,7 +29,6 @@ class HotelsRepository(BaseRepository):
             .select_from(RoomsOrm)
             .filter(RoomsOrm.id.in_(rooms_ids_to_get))
         )
-
         query = select(HotelsOrm).filter(HotelsOrm.id.in_(hotels_ids_to_get))
         if location:
             query = query.filter(func.lower(HotelsOrm.location).contains(location.strip().lower()))

@@ -15,6 +15,7 @@ class BaseRepository:
         query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)
         return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
+
     async def get_all(self, *args, **kwargs):
         return await self.get_filtered()
 

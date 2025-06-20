@@ -1,4 +1,3 @@
-from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
 from src.repositories.rooms import RoomsRepository
 from src.repositories.users import UsersRepository
