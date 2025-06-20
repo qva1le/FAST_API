@@ -30,3 +30,4 @@ class BookingDataMapper(DataMapper):
 class FacilitiesDataMapper(DataMapper):
     db_model = FacilitiesOrm
     schema = Facility
+

@@ -1,4 +1,6 @@
 from src.repositories.hotels import HotelsRepository
+from src.repositories.mappers.mappers import BookingDataMapper, HotelDataMapper, RoomDataMapper, UserDataMapper, \
+    FacilitiesDataMapper
 from src.repositories.rooms import RoomsRepository
 from src.repositories.users import UsersRepository
 from src.repositories.bookings import BookingsRepository
@@ -14,12 +16,12 @@ class DBManager:
     async def __aenter__(self):
         self.session = self.session_factory()
 
-        self.hotels = HotelsRepository(self.session)
-        self.rooms = RoomsRepository(self.session)
-        self.users = UsersRepository(self.session)
-        self.bookings = BookingsRepository(self.session)
-        self.facilities = FacilitiesRepository(self.session)
-        self.rooms_facilities = RoomsFacilitiesRepository(self.session)
+        self.hotels = HotelsRepository(self.session, mapper=HotelDataMapper)
+        self.rooms = RoomsRepository(self.session, mapper=RoomDataMapper)
+        self.users = UsersRepository(self.session, mapper=UserDataMapper)
+        self.bookings = BookingsRepository(self.session, mapper=BookingDataMapper)
+        self.facilities = FacilitiesRepository(self.session, mapper=FacilitiesDataMapper)
+        self.rooms_facilities = RoomsFacilitiesRepository(self.session, mapper=None)
 
         return self
 

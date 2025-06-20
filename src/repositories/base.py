@@ -8,8 +8,9 @@ class BaseRepository:
     model = None
     mapper: DataMapper = None
 
-    def __init__(self, session):
+    def __init__(self, session, mapper):
         self.session = session
+        self.mapper = mapper
 
     async def get_filtered(self, *filter, **filter_by):
         query = select(self.model).filter(*filter).filter_by(**filter_by)
