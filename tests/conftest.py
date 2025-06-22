@@ -5,6 +5,7 @@ from httpx import AsyncClient
 from httpx import ASGITransport
 
 import pytest
+from pytest_asyncio.plugin import scope
 
 from src.api.dependecies import get_db
 from src.config import settings
@@ -68,4 +69,15 @@ async def register_user(ac, setup_database):
             "/auth/register",
             json={"email": "kot@pes.com", "password": "1234"}
         )
+
+@pytest.fixture(scope="session", autouse=True)
+async def authenticated_ac(ac):
+    response = await ac.post(
+        "/auth/login",
+        json={"email": "kot@pes.com", "password": "1234"}
+    )
+
+    assert response.cookies
+    assert "access_token" in ac.cookies
+
 

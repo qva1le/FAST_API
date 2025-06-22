@@ -2,6 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 import uvicorn
+from unittest import mock
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
@@ -32,6 +34,7 @@ async def lifespan(app: FastAPI):
     await redis_manager.connect()
     yield
     await redis_manager.close()
+
 
 
 app = FastAPI(lifespan=lifespan)

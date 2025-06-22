@@ -1,6 +1,6 @@
 from src.schemas.facilities import FacilitiesAdd, FacilitiesAddRequest
 
-async def test_add_facilities(db):
+async def test_post_facilities(db):
     facility_data = FacilitiesAddRequest(
         title="Бесплатный Бар"
     )
