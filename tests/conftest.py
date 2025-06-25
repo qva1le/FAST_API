@@ -28,7 +28,6 @@ def check_test_mode():
 
 async def get_db_null_pool():
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
-        print("ПРИВЕТ Я ПЕРЕЗАПИСАН")
         yield db
 
 @pytest.fixture(scope="function")
@@ -70,8 +69,8 @@ async def register_user(ac, setup_database):
             json={"email": "kot@pes.com", "password": "1234"}
         )
 
-@pytest.fixture(scope="session", autouse=True)
-async def authenticated_ac(ac):
+@pytest.fixture(scope="session")
+async def authenticated_ac(register_user, ac):
     response = await ac.post(
         "/auth/login",
         json={"email": "kot@pes.com", "password": "1234"}
@@ -79,5 +78,7 @@ async def authenticated_ac(ac):
 
     assert response.cookies
     assert "access_token" in ac.cookies
+
+    return ac
 
 
