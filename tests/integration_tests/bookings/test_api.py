@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy import delete
 
 from src.models.bookings import BookingsOrm
+from tests.conftest import get_db_null_pool
 
 
 @pytest.mark.parametrize("room_id, date_from, date_to, status_code", [
@@ -29,18 +30,20 @@ async def test_add_booking(
         assert res["status"] == "OK"
         assert "data" in res
 
-@pytest.fixture(scope="session")
-async def delete_all_bookings(db):
-    await db.session.execute(delete(BookingsOrm))
-    await db.commit()
+@pytest.fixture(scope="module")
+async def delete_all_bookings():
+    async for _db in get_db_null_pool():
+        await _db.bookings.delete()
+        await _db.commit()
 
 @pytest.mark.parametrize("room_id, date_from, date_to, expected_status", [
-    (1, "2024-08-01", "2024-08-10", 200),
-    (2, "2025-08-01", "2025-08-10", 200),
-    (1, "2024-08-01", "2024-08-10", 500),
+    (1, "2024-08-01", "2024-08-10", 1),
+    (2, "2025-08-01", "2025-08-10", 2),
+    (1, "2024-08-01", "2024-08-10", 3),
 ])
 async def test_add_and_get_bookings(
     room_id, date_from, date_to, expected_status,
+    delete_all_bookings,
     db, authenticated_ac
 ):
     response = await authenticated_ac.post(

@@ -8,6 +8,10 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и аутент
 
 @router.post("/register")
 async def register_user(data: UserRequestAdd, db: DBDep):
+    existing_user = await db.users.get_one_or_none(email=data.email)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Пользователь с таким email уже зарегистрирован")
+
     hashed_password = AuthServices().hash_password(data.password)
     new_user_data = UserAdd(email=data.email, hashed_password=hashed_password)
     await db.users.add(new_user_data)
@@ -27,10 +31,10 @@ async def login_user(data: UserRequestAdd, response: Response, db: DBDep):
 
 @router.get("/me")
 async def get_me(user_id: UserIdDep, db: DBDep):
-        user = await db.users.get_one_or_none(id=user_id)
-        return user
+        return await db.users.get_one_or_none(id=user_id)
+
 
 @router.get("/logout")
 async def logout_user(response: Response):
         response.delete_cookie("access_token")
-        return response
+        return {"status": "OK"}

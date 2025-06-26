@@ -1,11 +1,11 @@
 import json
-from pathlib import Path
+
 
 from httpx import AsyncClient
 from httpx import ASGITransport
 
 import pytest
-from pytest_asyncio.plugin import scope
+
 
 from src.api.dependecies import get_db
 from src.config import settings
