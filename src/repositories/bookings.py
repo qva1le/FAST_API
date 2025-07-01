@@ -4,6 +4,7 @@ from distutils.util import execute
 from fastapi import HTTPException
 from sqlalchemy import select
 
+from src.exceptions import AllRoomsAreBookedException
 from src.models.rooms import RoomsOrm
 from src.repositories.base import BaseRepository
 from src.models.bookings import BookingsOrm
@@ -51,9 +52,8 @@ class BookingsRepository(BaseRepository):
             new_booking = await self.add(data)
             #возвращаем бронь
             return new_booking
-        else:
-            #иначе ошибка
-            raise HTTPException(500)
+
+        raise AllRoomsAreBookedException
 
 
 

@@ -23,6 +23,7 @@ httpcore==1.0.7
 httptools==0.6.4
 httpx==0.28.1
 idna==3.10
+iniconfig==2.1.0
 Jinja2==3.1.6
 kombu==5.5.4
 Mako==1.3.10
@@ -37,12 +38,16 @@ pathspec==0.12.1
 pendulum==3.1.0
 pillow==11.2.1
 platformdirs==4.3.7
+pluggy==1.6.0
 prompt_toolkit==3.0.51
 pydantic==2.11.2
 pydantic-settings==2.9.1
 pydantic_core==2.33.1
 Pygments==2.19.1
 PyJWT==2.10.1
+pytest==8.4.1
+pytest-asyncio==1.0.0
+pytest-dotenv==0.5.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 python-multipart==0.0.20
@@ -50,6 +55,7 @@ PyYAML==6.0.2
 redis==6.2.0
 rich==14.0.0
 rich-toolkit==0.14.1
+ruff==0.12.1
 shellingham==1.5.4
 six==1.17.0
 sniffio==1.3.1

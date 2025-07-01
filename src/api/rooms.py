@@ -1,8 +1,9 @@
 from datetime import date
 
-from fastapi import FastAPI, Body, Query, APIRouter
+from fastapi import FastAPI, Body, Query, APIRouter, HTTPException
 
 from src.api.dependecies import PaginationDep, DBDep
+from src.exceptions import RoomDoesNotExist
 from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
 from src.schemas.rooms_facilities import RoomFacilityAdd, RoomFacility
 
@@ -21,7 +22,11 @@ async def get_rooms(
 
 @router.get("/{hotel_id}/rooms/{room_id}")
 async def get_room(hotel_id: int, room_id: int, db: DBDep):
-        return await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
+    room = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
+    if room is None:
+        raise HTTPException(status_code=404, detail="Такого номера не существует")
+    return room
+
 
 @router.post("/{hotel_id}/rooms")
 async def create_room(hotel_id: int, room_data: RoomAddRequest, db: DBDep):
@@ -63,8 +68,11 @@ async def partially_edit_room(
 
 @router.delete("/{hotel_id}/rooms/{room_id}")
 async def delete_room(hotel_id: int, room_id: int, db: DBDep):
-    await db.rooms.delete(id=room_id, hotel_id=hotel_id)
-    await db.commit()
+    try:
+        await db.rooms.delete(id=room_id, hotel_id=hotel_id)
+        await db.commit()
+    except RoomDoesNotExist as ex:
+        raise HTTPException(status_code=404,detail=ex.detail)
     return {"status": "OK"}
 
 

@@ -1,5 +1,5 @@
 from datetime import date
-from sqlalchemy import select, func
+from sqlalchemy import select, func, delete
 from sqlalchemy.orm import selectinload, joinedload
 
 from src.repositories.base import BaseRepository
@@ -40,4 +40,3 @@ class RoomsRepository(BaseRepository):
         if model is None:
             return None
         return RoomWithRels.model_validate(model)
-
