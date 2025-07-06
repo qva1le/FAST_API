@@ -1,7 +1,9 @@
 from datetime import date
 from sqlalchemy import select, func, delete
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import selectinload, joinedload
 
+from src.exceptions import ObjectNotFoundException
 from src.repositories.base import BaseRepository
 from src.models.rooms import RoomsOrm
 from src.repositories.mappers.mappers import RoomDataMapper
@@ -29,14 +31,16 @@ class RoomsRepository(BaseRepository):
         result = await self.session.execute(query)
         return [RoomWithRels.model_validate(model) for model in result.unique().scalars().all()]
 
-    async def get_one_or_none_with_rels(self, **filter_by):
+    async def get_one_with_rels(self, **filter_by):
         query = (
             select(self.model)
             .options(selectinload(self.model.facilities))
             .filter_by(**filter_by)
         )
         result = await self.session.execute(query)
-        model = result.scalars().one_or_none()
-        if model is None:
-            return None
+
+        try:
+            model = result.scalars().one()
+        except NoResultFound:
+            raise ObjectNotFoundException
         return RoomWithRels.model_validate(model)

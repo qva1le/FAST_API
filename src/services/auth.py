@@ -5,9 +5,10 @@ from passlib.context import CryptContext
 import jwt
 
 from src.config import settings
+from src.services.base import BaseService
 
 
-class AuthServices:
+class AuthServices(BaseService):
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def create_access_token(self, data: dict) -> str:

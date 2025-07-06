@@ -1,20 +1,21 @@
 from contextlib import asynccontextmanager
+import logging
+import sys
+from pathlib import Path
 
 from fastapi import FastAPI
 import uvicorn
 from unittest import mock
+
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import  cache
 
-import sys
-from pathlib import Path
-
-
-
 sys.path.append(str(Path(__file__).parent.parent))
+
+logging.basicConfig(level=logging.INFO)
 
 from api.hotels import router as router_hotels
 from src.api.auth import router as router_auth

@@ -54,7 +54,7 @@ async def test_all_auth(
     )
 
     assert response_register_again.status_code == 400
-    assert response_register_again.json()["detail"] == "Пользователь с таким email уже зарегистрирован"
+    assert response_register_again.json()["detail"] == "Такой пользователь уже существует"
 
     response_me_again = await ac.get(
         "/auth/me",

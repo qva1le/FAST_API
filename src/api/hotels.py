@@ -5,9 +5,10 @@ from fastapi import FastAPI, Body, Query, APIRouter, HTTPException
 from fastapi_cache.decorator import cache
 
 from src.api.dependecies import PaginationDep, DBDep
-from src.exceptions import DatesAreIncorrect, HotelDoesNotExist
+from src.exceptions import DatesAreIncorrect, HotelDoesNotExist, ObjectNotFoundException
 from src.repositories.mappers.mappers import HotelDataMapper
 from src.schemas.hotels import Hotel, HotelPatch, HotelAdd
+from src.services.hotels import HotelService
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -22,24 +23,22 @@ async def get_hotels(
         date_to: date = Query(example="2025-06-05"),
 
 ):
-        if date_from >= date_to:
-            raise HTTPException(status_code=409, detail=DatesAreIncorrect.detail)
-        per_page = pagination.per_page or 5
-        return await db.hotels.get_filtered_by_time(
-            date_from=date_from,
-            date_to=date_to,
-            location=location,
-            title=title,
-            limit=per_page,
-            offset=per_page * (pagination.page - 1)
+        hotels = await HotelService(db).get__filtered_by_time(
+            pagination,
+            location,
+            title,
+            date_from,
+            date_to,
         )
+        return {"status": "OK", "hotels": hotels}
+
 
 @router.get("/{hotel_id}")
 async def get_hotel(hotel_id: int, db: DBDep):
-    hotel = await db.hotels.get_one_or_none(id=hotel_id)
-    if hotel is None:
-        raise HTTPException(status_code=404, detail="Отель не найден")
-    return hotel
+    try:
+        return await HotelService(db).get_hotel(hotel_id)
+    except ObjectNotFoundException:
+        raise HotelDoesNotExist
 
 @router.post("", summary="Создание отеля", description="<h1>Тут мы создаем отель<h1>")
 async def create_hotel(
@@ -61,9 +60,8 @@ async def create_hotel(
         })
 
 ):
-         hotel = await db.hotels.add(hotel_data)
-         await db.commit()
-         return {"status": "OK", "hotel": hotel}
+    hotel = HotelService(db).add_hotel(hotel_data)
+    return {"status": "OK", "hotel": hotel}
 
 @router.put("/{hotel_id}", summary="Изменение всего отеля", description="<h1>Тут мы изменяем весь отель<h1>")
 async def edit_hotel(hotel_id: int, hotel_data: HotelAdd, db: DBDep):
